@@ -1,5 +1,7 @@
 const { WebClient } = require('@slack/web-api');
 const { createEventAdapter } = require('@slack/events-api');
+const fs = require('fs');
+const path = require('path');
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -148,8 +150,37 @@ slackEvents.on('app_mention', (event) => {
                         }
                     case '<@U04GXJSM1UL> Save':
                         {
-                            
+                            order = JSON.stringify({
+                                name: pizzaName,
+                                size: pizzaSize,
+                                sizeboard: pizzaSideboard,
+                                address: deliveryAddress
+                            })
+                            fs.appendFile(path.join(__dirname,'orders.txt'), order, function (err,data){
+                                if(err)
+                                {
+                                    console.log(err);
+                                }
+                                else
+                                {
+                                    console.log(data);
+                                }
+                            });
+                            break;
                         }
+                        case '<@U04GXJSM1UL> Delete':
+                            {
+                                fs.rm(path.join(__dirname,'orders.txt'),function (err,data){
+                                    if(err)
+                                    {
+                                        console.log(err);
+                                    }
+                                    else
+                                    {
+                                        console.log(data);
+                                    }}); 
+                                    break;
+                            }
                     default:
                         {
                             await slackClient.chat.postMessage({
