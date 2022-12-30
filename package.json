@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js"
+    "startSlackBot": "node app.js"
   },
   "repository": {
     "type": "git",
@@ -24,6 +24,7 @@
     "@slack/events-api": "^3.0.1",
     "@slack/web-api": "^6.8.0",
     "dotenv": "^16.0.3",
+    "ejs": "^3.1.8",
     "express": "^4.18.2",
     "ngrok": "^4.3.3"
   }
