@@ -33,6 +33,7 @@ slackEvents.on('app_mention', (event) => {
                     channel: event.channel,
                     text: startMessage
                 });
+
                 await slackClient.chat.postMessage({
                     channel: event.channel,
                     text: dataMessage
@@ -150,37 +151,52 @@ slackEvents.on('app_mention', (event) => {
                         }
                     case '<@U04GXJSM1UL> Save':
                         {
+                            if (pizzaName == 'undefined'
+                                || pizzaSize == 'undefined'
+                                || pizzaSideboard == 'undefined'
+                                || deliveryAddress == 'undefined') {
+                                await slackClient.chat.postMessage({
+                                    channel: event.channel,
+                                    text: `Order isn't fully entered`
+                                });
+                                break;
+                            }
                             order = JSON.stringify({
                                 name: pizzaName,
                                 size: pizzaSize,
                                 sizeboard: pizzaSideboard,
                                 address: deliveryAddress
                             })
-                            fs.appendFile(path.join(__dirname,'orders.txt'), order, function (err,data){
-                                if(err)
-                                {
+                            fs.appendFile(path.join(__dirname, 'orders.txt'), order, function (err, data) {
+                                if (err) {
                                     console.log(err);
                                 }
-                                else
-                                {
+                                else {
                                     console.log(data);
                                 }
                             });
                             break;
                         }
-                        case '<@U04GXJSM1UL> Delete':
-                            {
-                                fs.rm(path.join(__dirname,'orders.txt'),function (err,data){
-                                    if(err)
-                                    {
-                                        console.log(err);
-                                    }
-                                    else
-                                    {
-                                        console.log(data);
-                                    }}); 
-                                    break;
-                            }
+                    case '<@U04GXJSM1UL> Delete':
+                        {
+                            fs.rm(path.join(__dirname, 'orders.txt'), function (err, data) {
+                                if (err) {
+                                    console.log(err);
+                                }
+                                else {
+                                    console.log(data);
+                                }
+                            });
+                            break;
+                        }
+                    case '<@U04GXJSM1UL> Clear order':
+                        {
+                            pizzaName = 'undefined';
+                            pizzaSize = 'undefined';
+                            pizzaSideboard = 'undefined';
+                            deliveryAddress = 'undefined';
+                            break;
+                        }
                     default:
                         {
                             await slackClient.chat.postMessage({
@@ -190,6 +206,23 @@ slackEvents.on('app_mention', (event) => {
                             break;
                         }
                 }
+                var orderState = `Your entered:\n`;
+                if (pizzaName !== 'undefined') {
+                    orderState += `Pizza name: ${pizzaName}\n`;
+                }
+                if (pizzaSize !== 'undefined') {
+                    orderState += `Pizza size: ${pizzaSize}\n`;
+                }
+                if (pizzaSideboard !== 'undefined') {
+                    orderState += `Pizza sizeboard: ${pizzaSideboard}\n`;
+                }
+                if (deliveryAddress !== 'undefined') {
+                    orderState += `Delivery address: ${deliveryAddress}\n`;
+                }
+                await slackClient.chat.postMessage({
+                    channel: event.channel,
+                    text: orderState
+                });
                 console.log(`Pizza name: ${pizzaName}`);
                 console.log(`Pizza size: ${pizzaSize}`);
                 console.log(`Pizza sizeboard: ${pizzaSideboard}`);
