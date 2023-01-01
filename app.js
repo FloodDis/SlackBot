@@ -3,19 +3,31 @@ const { createEventAdapter } = require('@slack/events-api');
 const fs = require('fs');
 const path = require('path');
 const dotenv = require('dotenv');
+const { fileLoader } = require('ejs');
+const { F_OK } = require('constants');
 dotenv.config();
 
 const slackSigningSecret = process.env.SLACK_SIGNING_SECRET;
 const slackBotToken = process.env.SLACK_BOT_TOKEN;
 const port = process.env.SLACK_BOT_PORT;
+const participantID = process.env.PARTICIPANT_ID;
 
 const slackEvents = createEventAdapter(slackSigningSecret);
 const slackClient = new WebClient(slackBotToken);
 
 var pizzaName = 'undefined';
 var pizzaSize = 'undefined';
+var doughThickness = 'undefined';
 var pizzaSideboard = 'undefined';
 var deliveryAddress = 'undefined';
+
+function ClearOrder() {
+    pizzaName = 'undefined';
+    pizzaSize = 'undefined';
+    doughThickness = 'undefined';
+    pizzaSideboard = 'undefined';
+    deliveryAddress = 'undefined';
+}
 
 slackEvents.on('app_mention', (event) => {
     console.log(`Got message from ${event.user}: ${event.text}`);
@@ -25,10 +37,11 @@ slackEvents.on('app_mention', (event) => {
             dataMessage = `For making an order you need to enter:\n` +
                 `1) Pizza name (Marinara, Margarita, Calzone)\n` +
                 `2) Size (Small, Medium, Large)\n` +
-                `3) Sideboard (Regular, Cheese, Sausage)\n` +
-                `4) Delivery address`;
-            if (event.text === `<@U04GXJSM1UL> Hello` ||
-                event.text === `<@U04GXJSM1UL> Hi`) {
+                `3) Dough thickness (Thin, Normal)\n`+
+                `4) Sideboard (Regular, Cheese, Sausage)\n` +
+                `5) Delivery address (Tomsk, Novokuznetsk, Novosibirsk)`;
+            if (event.text === `<@${participantID}> Hello` ||
+                event.text === `<@${participantID}> Hi`) {
                 await slackClient.chat.postMessage({
                     channel: event.channel,
                     text: startMessage
@@ -41,7 +54,7 @@ slackEvents.on('app_mention', (event) => {
             }
             else {
                 switch (event.text) {
-                    case '<@U04GXJSM1UL> Marinara':
+                    case `<@${participantID}> Marinara`:
                         {
                             pizzaName = 'Marinara';
                             await slackClient.chat.postMessage({
@@ -50,7 +63,7 @@ slackEvents.on('app_mention', (event) => {
                             });
                             break;
                         }
-                    case '<@U04GXJSM1UL> Margarita':
+                    case `<@${participantID}> Margarita`:
                         {
                             pizzaName = 'Margarita';
                             await slackClient.chat.postMessage({
@@ -59,7 +72,7 @@ slackEvents.on('app_mention', (event) => {
                             });
                             break;
                         }
-                    case '<@U04GXJSM1UL> Calzone':
+                    case `<@${participantID}> Calzone`:
                         {
                             pizzaName = 'Calzone';
                             await slackClient.chat.postMessage({
@@ -68,7 +81,7 @@ slackEvents.on('app_mention', (event) => {
                             });
                             break;
                         }
-                    case '<@U04GXJSM1UL> Small':
+                    case `<@${participantID}> Small`:
                         {
                             pizzaSize = 'Small';
                             await slackClient.chat.postMessage({
@@ -77,7 +90,7 @@ slackEvents.on('app_mention', (event) => {
                             });
                             break;
                         }
-                    case '<@U04GXJSM1UL> Medium':
+                    case `<@${participantID}> Medium`:
                         {
                             pizzaSize = 'Medium';
                             await slackClient.chat.postMessage({
@@ -86,7 +99,7 @@ slackEvents.on('app_mention', (event) => {
                             });
                             break;
                         }
-                    case '<@U04GXJSM1UL> Large':
+                    case `<@${participantID}> Large`:
                         {
                             pizzaSize = 'Large';
                             await slackClient.chat.postMessage({
@@ -95,7 +108,25 @@ slackEvents.on('app_mention', (event) => {
                             });
                             break;
                         }
-                    case '<@U04GXJSM1UL> Regular':
+                    case `<@${participantID}> Thin`:
+                        {
+                            doughThickness = 'Thin';
+                            await slackClient.chat.postMessage({
+                                channel: event.channel,
+                                text: `Dough thickness stored`
+                            });
+                            break;
+                        }
+                    case `<@${participantID}> Normal`:
+                        {
+                            doughThickness = 'Normal';
+                            await slackClient.chat.postMessage({
+                                channel: event.channel,
+                                text: `Dough thickness stored`
+                            });
+                            break;
+                        }
+                    case `<@${participantID}> Regular`:
                         {
                             pizzaSideboard = 'Regular';
                             await slackClient.chat.postMessage({
@@ -104,7 +135,7 @@ slackEvents.on('app_mention', (event) => {
                             });
                             break;
                         }
-                    case '<@U04GXJSM1UL> Cheese':
+                    case `<@${participantID}> Cheese`:
                         {
                             pizzaSideboard = 'Cheese';
                             await slackClient.chat.postMessage({
@@ -113,7 +144,7 @@ slackEvents.on('app_mention', (event) => {
                             });
                             break;
                         }
-                    case '<@U04GXJSM1UL> Sausage':
+                    case `<@${participantID}> Sausage`:
                         {
                             pizzaSideboard = 'Sausage';
                             await slackClient.chat.postMessage({
@@ -122,7 +153,7 @@ slackEvents.on('app_mention', (event) => {
                             });
                             break;
                         }
-                    case '<@U04GXJSM1UL> Tomsk':
+                    case `<@${participantID}> Tomsk`:
                         {
                             deliveryAddress = 'Tomsk';
                             await slackClient.chat.postMessage({
@@ -131,7 +162,7 @@ slackEvents.on('app_mention', (event) => {
                             });
                             break;
                         }
-                    case '<@U04GXJSM1UL> Novokuznetsk':
+                    case `<@${participantID}> Novokuznetsk`:
                         {
                             deliveryAddress = 'Novokuznetsk';
                             await slackClient.chat.postMessage({
@@ -140,7 +171,7 @@ slackEvents.on('app_mention', (event) => {
                             });
                             break;
                         }
-                    case '<@U04GXJSM1UL> Novosibirsk':
+                    case `<@${participantID}> Novosibirsk`:
                         {
                             deliveryAddress = 'Novosibirsk';
                             await slackClient.chat.postMessage({
@@ -149,10 +180,11 @@ slackEvents.on('app_mention', (event) => {
                             });
                             break;
                         }
-                    case '<@U04GXJSM1UL> Save':
+                    case `<@${participantID}> Save`:
                         {
                             if (pizzaName == 'undefined'
                                 || pizzaSize == 'undefined'
+                                || doughThickness == 'undefined'
                                 || pizzaSideboard == 'undefined'
                                 || deliveryAddress == 'undefined') {
                                 await slackClient.chat.postMessage({
@@ -161,40 +193,39 @@ slackEvents.on('app_mention', (event) => {
                                 });
                                 break;
                             }
-                            order = JSON.stringify({
+                            order = {
                                 name: pizzaName,
                                 size: pizzaSize,
+                                thickness: doughThickness,
                                 sizeboard: pizzaSideboard,
                                 address: deliveryAddress
+                            };
+                            var data;
+                            try {
+                                data = require('./orders.json');
+                            } catch (err) {
+                                fs.writeFileSync('orders.json', '[]');
+                                data = require('./orders.json');
+                            }
+                            data.push(order);
+                            fs.writeFileSync('orders.json', JSON.stringify(data, null, 2), function (err, data) {
+                                if (err) {
+                                    console.log(err);
+                                }
+                                else {
+                                    console.log(data);
+                                }
                             })
-                            fs.appendFile(path.join(__dirname, 'orders.txt'), order, function (err, data) {
-                                if (err) {
-                                    console.log(err);
-                                }
-                                else {
-                                    console.log(data);
-                                }
+                            await slackClient.chat.postMessage({
+                                channel: event.channel,
+                                text: `The order has been accepted for processing`
                             });
+                            ClearOrder();
                             break;
                         }
-                    case '<@U04GXJSM1UL> Delete':
+                    case `<@${participantID}> Clear order`:
                         {
-                            fs.rm(path.join(__dirname, 'orders.txt'), function (err, data) {
-                                if (err) {
-                                    console.log(err);
-                                }
-                                else {
-                                    console.log(data);
-                                }
-                            });
-                            break;
-                        }
-                    case '<@U04GXJSM1UL> Clear order':
-                        {
-                            pizzaName = 'undefined';
-                            pizzaSize = 'undefined';
-                            pizzaSideboard = 'undefined';
-                            deliveryAddress = 'undefined';
+                            ClearOrder();
                             break;
                         }
                     default:
@@ -213,6 +244,9 @@ slackEvents.on('app_mention', (event) => {
                 if (pizzaSize !== 'undefined') {
                     orderState += `Pizza size: ${pizzaSize}\n`;
                 }
+                if (doughThickness !== 'undefined') {
+                    orderState += `Dough thickness: ${doughThickness}\n`;
+                }
                 if (pizzaSideboard !== 'undefined') {
                     orderState += `Pizza sizeboard: ${pizzaSideboard}\n`;
                 }
@@ -225,6 +259,7 @@ slackEvents.on('app_mention', (event) => {
                 });
                 console.log(`Pizza name: ${pizzaName}`);
                 console.log(`Pizza size: ${pizzaSize}`);
+                console.log(`Dough thickness: ${doughThickness}`)
                 console.log(`Pizza sizeboard: ${pizzaSideboard}`);
                 console.log(`Delivery adress: ${deliveryAddress}`);
             }
