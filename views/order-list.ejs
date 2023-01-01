@@ -1,10 +1,36 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <title>Pizza order list</title>
-    </head>
-    <body>
-        <h1>Pizza order list</h1>
-    </body>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Pizza order list</title>
+</head>
+
+<body>
+    <h1>Pizza order list</h1>
+    <div class="content"></div>
+    <script>
+        document.write('<table width="100%" border="1">');
+        document.writeln("<tr>");
+        document.write("<td>" + 'Order ID' + "<\/td>");
+        document.write("<td>" + 'Pizza name' + "<\/td>");
+        document.write("<td>" + 'Pizza size' + "<\/td>");
+        document.write("<td>" + 'Dough thickness' + "<\/td>");
+        document.write("<td>" + 'Sideboard' + "<\/td>");
+        document.write("<td>" + 'Delivery address' + "<\/td>");
+        document.write("<td>" + 'Status' + "<\/td>");
+        document.writeln("<\/tr>");
+        document.writeln("<tr>");
+        document.write("<td>" + '1' + "<\/td>");
+        document.write("<td>" + 'Calzone' + "<\/td>");
+        document.write("<td>" + 'Small' + "<\/td>");
+        document.write("<td>" + 'Thin' + "<\/td>");
+        document.write("<td>" + 'Regular' + "<\/td>");
+        document.write("<td>" + 'Tomsk' + "<\/td>");
+        document.write("<td>" + '<button disabled>Confirmed</button>' + "<\/td>");
+        document.writeln("<\/tr>");
+        document.write("<\/table> ");
+    </script>
+</body>
+
 </html>
